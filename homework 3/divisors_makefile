@@ -1,0 +1,1 @@
+gcc -o divisors.c divisors
