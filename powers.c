@@ -14,8 +14,10 @@ exponent = exponent / 2;
 return result * base;
 }
 
-int main(){
-long c = power(2,30);
+int main(int argc, char* argv[]){
+int base = atoi(argv[1]);
+int exponent = atoi(argv[2]);
+long c = power(base, exponent);
 printf("%d", c);
 return 0;
 }
