@@ -5,3 +5,8 @@ d) min = -(2**10), max = (2**10) -1
 
 
 
+6)a) The largest possible value would be placing 0 as the sign bit, and filling the exponent and significand with 1s, which results in 
+0 1111 111. This can be converted to decimal by 1.111 * 2^(15-7) = 111000000, which is 448. The difference is 480 - 448 which is 32.
+
+b) The smallest possible value would be all zeroes and if we have 1.000 * 2^-7 which is 0.007812. The second smallest would be adding a 1 to the significand,
+which would be 0 0000 001 and computes to 1.001 * 2^(-7), which is 0.00782. The difference between the smallest and second smallest value is 0.00001.
