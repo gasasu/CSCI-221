@@ -29,7 +29,7 @@ Your class should have the following functionality
 (n) (1 point) The class should not cause any memory leaks.
 (o) (1 point) The class should have functions properly marked as constant.
 */
-
+// class definition of a linked list node
 class Node{
 public:
     string value;
@@ -40,31 +40,39 @@ public:
     };
 
 
-
+// class definition of our sorted list
+// I used 1 to denote sorting by length and 2 for sorting by character
 class SortedList{
 
 public:
     Node* head = new Node("head");
+    // constructor with no arguments
     SortedList(){
         sort = 1;
         len = 0;
     }
+    // constructor specifying what sorting method to use.
     SortedList(int choice){
         sort = choice;
         len = 0;
     }
+    // destructor to prevent memory leaks
+    ~SortedList(){
+    this->removeall();
+    delete head;
+    }
     void addNode(string data);
-    bool isSortedByLength();
-    bool isSortedByChar();
-    int lengthOfList();
-    void printlist();
+    bool isSortedByLength() const;
+    bool isSortedByChar() const;
+    int lengthOfList() const;
+    void printlist() const;
     SortedList* copyll();
-    int getsort();
+    int getsort() const;
     void setsort(int i);
     void removeElement(string input);
     void removeall();
-    string* getlist();
-    string getiposition(int i);
+    string* getlist() const;
+    string getiposition(int i) const;
     void changesorttolength(SortedList lista);
     void changesorttochar(SortedList lista);
 
@@ -75,22 +83,25 @@ private:
     void sortByChar(string data);
     };
 
-int SortedList::lengthOfList(){
+// method to return length of list
+int SortedList::lengthOfList() const{
 return len;}
-int SortedList::getsort(){
+// method to return what sorting method is being used
+int SortedList::getsort() const{
 return sort;}
-bool SortedList::isSortedByLength(){
+// method to return whether the list is sorted by length
+bool SortedList::isSortedByLength() const{
 if (sort == 1){
     return true;
 }
 return false;}
-
-bool SortedList::isSortedByChar(){
+// method to return whether the list is sorted by char
+bool SortedList::isSortedByChar() const{
 if (sort == 1){
     return false;
 }
 return true;}
-
+// private method to sort list by length
 void SortedList::sortByLength(string input){
     int m = input.length();
 Node* newnode = new Node(input);
@@ -101,6 +112,7 @@ while (tmp->next != NULL && m > tmp->next->value.length()){
 newnode->next = tmp->next;
 tmp->next = newnode;
 }
+// private method to sort list by character
 void SortedList::sortByChar(string input){
     int m = input.length();
 Node* newnode = new Node(input);
@@ -111,7 +123,7 @@ while (tmp->next != NULL && input > tmp->next->value){
 newnode->next = tmp->next;
 tmp->next = newnode;
 }
-
+// method to add elements to the list
 void SortedList::addNode(string input){
 if (sort==1){
     sortByLength(input);
@@ -121,15 +133,15 @@ else{
 }
 len++;
 }
-
-void SortedList::printlist(){
+// method to print elements in the list. I created this for debugging
+void SortedList::printlist() const{
 Node* tmp = head->next;
 while (tmp != NULL){
     cout<<tmp->value<<endl;
     tmp = tmp->next;
 }
 }
-
+// method to deep copy of sorted list
 SortedList* SortedList::copyll(){
     SortedList* newlist = new SortedList(this->getsort());
     Node* tmp = this->head->next;
@@ -139,6 +151,7 @@ SortedList* SortedList::copyll(){
     }
     return newlist;
 }
+// method to remove instances of a particular element in the list
 void SortedList::removeElement(string input){
 Node* tmp = head;
 while (tmp->next != NULL){
@@ -153,6 +166,7 @@ while (tmp->next != NULL){
     }
 }
 }
+// method to remove all elements in the list
 void SortedList::removeall(){
 Node* tmp = head;
 while (tmp->next != NULL){
@@ -162,7 +176,8 @@ while (tmp->next != NULL){
         len--;
 }
 }
-string* SortedList::getlist(){
+// method to return a list of elements in the sorted list
+string* SortedList::getlist() const{
 string* values = new string[len];
 Node* tmp = head->next;
 int i=0;
@@ -173,8 +188,8 @@ while (tmp != NULL){
 }
 return values;
 }
-
-string SortedList::getiposition(int i){
+// method to return value in the ith position
+string SortedList::getiposition(int i)const{
 int j = 0;
 Node* tmp = head->next;
 while (tmp != NULL){
@@ -186,8 +201,10 @@ while (tmp != NULL){
 }
 return "index invalid";
 }
+// method to change sorting method used
 void SortedList::setsort(int i){
 sort = i;}
+// method that changes list to be sorted by character
 void SortedList::changesorttochar(SortedList lista){
 Node* tmp = head->next;
 setsort(2);
@@ -197,7 +214,7 @@ while (tmp != NULL){
     tmp = tmp->next;
 }
 }
-
+// method that changes list to be sorted by length
 void SortedList::changesorttolength(SortedList lista){
 Node* tmp = head->next;
 setsort(1);
@@ -211,14 +228,6 @@ int main(){
     SortedList lista(2);
     lista.addNode("him");
     lista.addNode("ahem");
-    lista.addNode("sam");
-    lista.addNode("bma");
-    lista.addNode("mk");
-    lista.addNode("mkere");
-    lista.addNode("cma");
-    lista.addNode("sma");
-    lista.addNode("qma");
-    lista.addNode("vma");
     lista.addNode("mk");
     lista.printlist();
     lista.changesorttolength(lista);
