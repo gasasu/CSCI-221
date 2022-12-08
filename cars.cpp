@@ -16,8 +16,13 @@ public:
     Car();
     bool canmoveto(int x, int y);
     bool moveto(int x, int y);
+    bool pmoveto(int x, int y);
     double getfuelcost(int x, int y);
     double refuel();
+    double pfuel;
+    double prefuel();
+    bool pcanmoveto(int x, int y);
+    double getfuel();
 private:
     int pos_x;
     int pos_y;
@@ -33,6 +38,7 @@ pos_y = 0;
 mpg = 5.0;
 fuel = 20.0;
 tankSize = 20.0;
+pfuel = fuel;
 };
 
 bool Car::canmoveto(int x, int y){
@@ -43,7 +49,14 @@ if (fuel_used <= fuel){
 }
 return false;
 };
-
+bool Car::pcanmoveto(int x, int y){
+double dist = sqrt(pow((x-pos_x),2) + pow((y-pos_y),2));
+double fuel_used = dist / mpg;
+if (fuel_used <= pfuel){
+    return true;
+}
+return false;
+};
 double Car::getfuelcost(int x, int y){
     double dist = sqrt(pow((x-pos_x),2) + pow((y-pos_y),2));
     return dist;
@@ -59,11 +72,29 @@ if (fuel_used <= fuel){
 }
 return false;
 };
-
+bool Car::pmoveto(int x, int y){
+double dist = sqrt(pow((x-pos_x),2) + pow((y-pos_y),2));
+double fuel_used = dist / mpg;
+if (fuel_used <= pfuel){
+    pos_x = x;
+    pos_y = y;
+    pfuel = pfuel - fuel_used;
+    return true;
+}
+return false;
+};
 double Car::refuel(){
 double b = tankSize - fuel;
 fuel = tankSize;
 return b;}
+
+double Car::prefuel(){
+double b = tankSize - pfuel;
+pfuel = tankSize;
+return b;}
+
+double Car::getfuel(){
+return fuel;}
 /*
 (4 points) Write a function that given an array of Cars and a point in two-dimensional space,
 returns an array containing a copy of each of the cars that can move to that space. The input
@@ -140,30 +171,41 @@ for (int i=0; i<cararraylength; i++){
         counter++;
     }
     else{
-        int j = gasarraylength-1;
-        double f = 0;
-        while (j>0){
-                if (j==gasarraylength) break;
-                double p=0;
-            int a = gasarray[j].getlocationX();
-        int b = gasarray[j].getlocationY();
-        int c = gasarray[j].getprice();
-        if (cararray[i].canmoveto(a,b)){
-         cararray[i].moveto(a,b);
-         p = cararray[i].refuel();
-            f += p*c;
-            j++;
+        int j = cararraylength -1; // start with last gasstation
+
+        while (j>-1){
+            double c = 0; // set cost = 0
+            int x = gasarray[j].getlocationX(); // get gasstation location
+            int y = gasarray[j].getlocationY();
+            cararray[i].pfuel = cararray[i].getfuel(); // reset pfuel to the car's actual fuel for each iteration
+            if (cararray[i].pcanmoveto(x,y)){ // if we can move to this gasstation
+                cararray[i].pmoveto(x,y); // we move to the gasstation
+                int m = j+1; // increment counter to the next gasstation
+                double d = cararray[i].prefuel(); // get amount of fuel needed to fill tank
+                c += d*gasarray[j].getprice(); // calculate cost
+                while (m<cararraylength){ // while we are not at the last gasstation
+                if (cararray[i].pcanmoveto(x,y)){ // if we can move to the next gasstation
+                cararray[i].pmoveto(x,y); // move to the gasstation
+                double d = cararray[i].prefuel(); // calculate amount of fuel needed to fill tank
+                c += d*gasarray[m].getprice(); // calculate cost
+                m++; // increment to next gasstation
+                }
+                else{
+                    break; // if we can't move to gasstation, then break out and try next loop iteration
+                }
+
+            }
+            if (m == cararraylength){ // if we found a suffix
+        result[counter] = cararray[i]; // store our car in result
+        cost[counter] = c; // store cost
+        counter++; // increment counter
+        break; // we break out of our outermost loop
+            }
+
         }
-        else{
-            j--;
-        }
-        }
-    if (j==gasarraylength){
-       result[counter] = cararray[i];
-        cost[counter] = f;
-        counter++;
+        j--;
     }
-    }
+}
 }
 return output{result, cost};
 }
