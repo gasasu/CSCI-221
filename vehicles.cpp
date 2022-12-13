@@ -5,6 +5,7 @@
 #include <memory>
 #include <string>
 #include <unordered_map>
+#include <bits/stdc++.h>
 using namespace std;
 
 
@@ -15,7 +16,7 @@ public:
     virtual bool moveto(int x, int y);
     double refuel();
     virtual double getfuel();
-
+    ~Car() = default;
 protected:
     int pos_x;
     int pos_y;
@@ -33,6 +34,7 @@ tankSize = 20.0;
 };
 
 bool Car::canmoveto(int x, int y){
+
 double dist = sqrt(pow((x-pos_x),2) + pow((y-pos_y),2));
 double fuel_used = dist / mpg;
 if (fuel_used <= fuel){
@@ -78,10 +80,7 @@ public:
     list<int> generateroute(int start);
     bool moveto(int x, int y);
     Bus(int p);
-    int getposx() const{
-    return pos_x;}
-    int getposy() const{
-    return pos_y;}
+    ~Bus() = default;
 private:
     int max_passengers;
     vector <int> stop;
@@ -94,6 +93,7 @@ max_passengers = 10;
 gmp = 0.05;
 passengers = p;
 }
+// updated moveto function to include gas mileage penalty per passenger
 bool Bus::moveto(int x, int y){
 double dist = sqrt(pow((x-pos_x),2) + pow((y-pos_y),2));
 double fuel_used = dist / mpg;
@@ -106,8 +106,9 @@ if (fuel_used <= fuel){
 }
 return false;
 }
+
 list<int> Bus::generateroute(int start) {
-  vector<int> stops_vec(passengers.begin(), passengers.end());
+  vector<int> stops_vec(stop.begin(), stop.end());
   sort(stops_vec.begin(), stops_vec.end());  // sort the stops in ascending order
   vector<int>::iterator it = unique(stops_vec.begin(), stops_vec.end());  // remove duplicates
   stops_vec.resize(distance(stops_vec.begin(), it));
@@ -133,8 +134,11 @@ list<int> Bus::generateroute(int start) {
   return stops;
 }
 
-#include <string>
-#include <unordered_map>
+/*
+Create a MedicalCenter class. This class should contain a data structure that lists the
+providers at the center and their roles, as well as another data structure that lists the patients at
+that center and their condition. Both roles and conditions should be represented with strings.
+*/
 
 class MedicalCenter {
 public:
@@ -148,16 +152,6 @@ public:
     patients[name] = condition;
   }
 
-  // get the role of the provider with the given name
-  std::string getProviderRole(const std::string& name) const {
-    return providers.at(name);
-  }
-
-  // get the condition of the patient with the given name
-  std::string getPatientCondition(const std::string& name) const {
-    return patients.at(name);
-  }
-
 private:
   // map from provider name to provider role
   std::unordered_map<std::string, std::string> providers;
@@ -166,57 +160,79 @@ private:
 };
 
 
-
-class MedicalCenter {
+/*
+Create an Ambulance Class. This class should inherit functionality from both a Car and
+a MedicalCenter. In addition, an ambulance should have three additional variables: a maximum
+capacity of patients, a maximum total capacity of patients and providers, and a gas mileage penalty
+per person. The moveto method should be overridden to use extra gas based on the product of the
+current capacity of the ambulance and the mileage per person penalty.
+*/
+class Ambulance: virtual public Car, virtual public MedicalCenter{
 public:
-  // add a provider to the center with the given role
-  void addProvider(const std::string& name, const std::string& role) {
-    providers[name] = role;
-  }
-
-  // add a patient to the center with the given condition
-  void addPatient(const std::string& name, const std::string& condition) {
-    patients[name] = condition;
-  }
-
-  // get the role of the provider with the given name
-  std::string getProviderRole(const std::string& name) const {
-    return providers.at(name);
-  }
-
-  // get the condition of the patient with the given name
-  std::string getPatientCondition(const std::string& name) const {
-    return patients.at(name);
-  }
-
+    bool moveto(int x, int y);
+    Ambulance();
+    ~Ambulance() = default;
 private:
-  // map from provider name to provider role
-  std::unordered_map<std::string, std::string> providers;
-  // map from patient name to patient condition
-  std::unordered_map<std::string, std::string> patients;
+    int max_patients;
+    int max_capacity;
+    int capacity;
+    double gmp;
 };
 
+Ambulance::Ambulance(){
+capacity = 0;
+gmp = 0.05;
+max_patients = 10;
+max_capacity = 20;
+}
 
+bool Ambulance::moveto(int x, int y){
+double dist = sqrt(pow((x-pos_x),2) + pow((y-pos_y),2));
+double fuel_used = dist / mpg;
+fuel_used += capacity * gmp;
+if (fuel_used <= fuel){
+    pos_x = x;
+    pos_y = y;
+    fuel -= fuel_used;
+    return true;
+}
+return false;
+}
+/*
+Write a function that takes as input a vector of unique pointers to Cars and a point in
+two-dimensional space. The function should return a vector containing a copy of each of the cars
+that can move to that space. The input array and the Cars in it should not be modified. The
+Cars in the output array should have the moveto method called on them prior to returning. Your
+function should be able to handle instances of Cars, Buses, and Ambulances in the input vector.
+Each should use the proper moveto method.
+*/
 
-
-std::vector<std::unique_ptr<Car>> moveCars(
-    const std::vector<std::unique_ptr<Car>>& cars,
-    int x,
-    int y) {
-  std::vector<std::unique_ptr<Car>> result;
+std::vector <Car*> moveCars( std::vector<std::unique_ptr<Car>>& cars,int x,int y) {
+  std::vector<Car*> result;
   for (const auto& car : cars) {
     if (car->canmoveto(x, y)) {
       // create a copy of the car that can move to the given location
-      auto copy = std::make_unique<Car>(*car);
+      auto *newptr = car.get(); // returns pointer to car object
+      auto cpy = *newptr; // creates a copy of the car object
       // move the copy to the given location
+      auto *copy = &cpy; // creates a pointer to the new object
       copy->moveto(x, y);
       // add the copy to the result vector
-      result.
+      result.push_back(copy);}
+  }
+  return result;
+}
 
 
 int main(){
-Bus b(6);
-b.moveto(3,4);
-cout << b.getfuel() << endl;
-cout << b.getposx() << endl;
-return 0;}
+    vector <std::unique_ptr <Car> > lista;
+    std::unique_ptr<Car> car = std::make_unique<Car>();
+    std::unique_ptr<Car> bus = std::make_unique<Bus>(7);
+    std::unique_ptr<Car> ambulance = std::make_unique<Ambulance>();
+    Ambulance amb;
+    Car *mv = &amb;
+    cout << ambulance->moveto(3,4) << endl;
+    cout << mv->moveto(1,2) << endl;
+    cout << amb.moveto(2,3) << endl;
+return 0;
+}
